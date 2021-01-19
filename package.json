@@ -1,0 +1,17 @@
+{
+	"scripts": {
+		"start": "micro --listen tcp://localhost:80"
+
+		, "dev": "micro-dev --port 80"
+	}
+	, "dependencies": {
+		"dotenv": "8.x"
+
+		, "micro": "9.x"
+
+		, "aws-sdk": "2.x"
+	}
+	, "devDependencies": {
+		"micro-dev": "3.x"
+	}
+}
