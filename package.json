@@ -10,6 +10,8 @@
 		, "micro": "9.x"
 
 		, "aws-sdk": "2.x"
+
+		, "mime-types": "2.x"
 	}
 	, "devDependencies": {
 		"micro-dev": "3.x"

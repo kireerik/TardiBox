@@ -4,6 +4,8 @@ const {buffer} = require('micro')
 
 , {S3} = require('aws-sdk')
 
+, {lookup} = require('mime-types')
+
 , {endpoint, accessKeyId, secretAccessKey, Bucket} = process.env
 
 , storage = new S3({endpoint, accessKeyId, secretAccessKey})
@@ -21,7 +23,12 @@ module.exports = async (request, response) => {
 					request.headers['upload-name'] + '/'
 					, ''
 					, {
-						Metadata: {
+						...(() => {
+							const ContentType = lookup(request.headers['upload-name'])
+
+							return ContentType ? {ContentType} : {}
+						})()
+						, Metadata: {
 							contentLength: request.headers['upload-length']
 						}
 					}
