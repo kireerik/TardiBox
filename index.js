@@ -4,7 +4,7 @@ const {buffer} = require('micro')
 
 , {S3} = require('aws-sdk')
 
-, {endpoint, accessKeyId, secretAccessKey, Bucket = 'delta2-8'} = process.env
+, {endpoint, accessKeyId, secretAccessKey, Bucket} = process.env
 
 , storage = new S3({endpoint, accessKeyId, secretAccessKey})
 
