@@ -1,8 +1,8 @@
 {
 	"scripts": {
-		"start": "micro --listen tcp://localhost:80"
+		"start": "micro --listen tcp://localhost:80 upload.js"
 
-		, "dev": "micro-dev --port 80"
+		, "dev": "micro-dev --port 80 upload.js"
 	}
 	, "dependencies": {
 		"dotenv": "8.x"
