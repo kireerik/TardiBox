@@ -64,5 +64,5 @@ module.exports = async (request, response) => {
 	if (uploads)
 		await Promise.all(uploads)
 
-	return ''
+	response.end()
 }
