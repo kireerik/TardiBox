@@ -4,17 +4,37 @@ const {buffer} = require('micro')
 
 , {S3} = require('aws-sdk')
 
-, {endpoint, accessKeyId, secretAccessKey} = process.env
+, {endpoint, accessKeyId, secretAccessKey, Bucket = 'delta2-8'} = process.env
 
 , storage = new S3({endpoint, accessKeyId, secretAccessKey})
 
+, upload = (Key, Body, settings = {}) =>
+	storage.upload({Bucket, Key, Body, ...settings}).promise()
+
 module.exports = async (request, response) => {
-	if (request.method == 'PATCH')
-		var upload = storage.upload({
-			Bucket: 'delta2-8'
-			, Key: request.headers['upload-name']
-			, Body: await buffer(request)
-		}).promise()
+	if (request.method == 'PATCH') {
+		var uploads = []
+
+		if (request.headers['upload-offset'] == 0)
+			uploads.push(
+				upload(
+					request.headers['upload-name'] + '/'
+					, ''
+					, {
+						Metadata: {
+							contentLength: request.headers['upload-length']
+						}
+					}
+				)
+			)
+
+		uploads.push(
+			upload(
+				request.headers['upload-name'] + '/' + request.headers['upload-offset']
+				, await buffer(request)
+			)
+		)
+	}
 
 	const isOptionsRequest = request.method == 'OPTIONS'
 
@@ -36,8 +56,8 @@ module.exports = async (request, response) => {
 			response.setHeader(...header)
 	)
 
-	if (upload)
-		await upload
+	if (uploads)
+		await Promise.all(uploads)
 
 	return ''
 }
