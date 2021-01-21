@@ -43,12 +43,10 @@ module.exports = async (request, response) => {
 		)
 	}
 
-	const isOptionsRequest = request.method == 'OPTIONS'
-
-	;[
+	[
 		['Access-Control-Allow-Origin', '*']
 
-		, ...(isOptionsRequest ? [
+		, ...(request.method == 'OPTIONS' ? [
 			, ['Access-Control-Allow-Methods', 'PATCH']
 			, ['Access-Control-Allow-Headers', [
 				'Content-Type'
