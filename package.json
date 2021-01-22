@@ -1,11 +1,13 @@
 {
 	"scripts": {
-		"start": "micro --listen tcp://localhost:80 upload.js"
+		"start": "concurrently \"micro --listen tcp://localhost:80 upload.js\" \"micro --listen tcp://localhost:81 download.js\" --kill-others-on-fail"
 
-		, "dev": "micro-dev --port 80 upload.js"
+		, "dev": "concurrently \"micro-dev --port 80 upload.js\" \"micro-dev --port 81 download.js\" --kill-others-on-fail"
 	}
 	, "dependencies": {
-		"dotenv": "8.x"
+		"concurrently": "5.x"
+
+		, "dotenv": "8.x"
 
 		, "micro": "9.x"
 

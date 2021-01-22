@@ -1,14 +1,8 @@
-require('dotenv').config()
-
 const {buffer} = require('micro')
-
-, {S3} = require('aws-sdk')
 
 , {lookup} = require('mime-types')
 
-, {endpoint, accessKeyId, secretAccessKey, Bucket} = process.env
-
-, storage = new S3({endpoint, accessKeyId, secretAccessKey})
+, {storage, Bucket} = require('./storage')
 
 , upload = (Key, Body, settings = {}) =>
 	storage.upload({Bucket, Key, Body, ...settings}).promise()
