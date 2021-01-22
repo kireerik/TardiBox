@@ -7,22 +7,35 @@ module.exports = async (request, response) => {
 	const fileName = request.url.substring(1)
 	, fileFolder = fileName + '/'
 
-	, {
-		ContentType, Metadata: {contentlength}
-	} =
-		await use('headObject', fileFolder)
+	var fileExists = false
 
-	;[
-		['Content-Type', ContentType]
-		, ['Content-Disposition', 'filename="' + fileName + '"']
-	].forEach(header =>
-		response.setHeader(...header)
-	)
+	try {
+		var {
+			ContentType, Metadata: {contentlength}
+		} =
+			await use('headObject', fileFolder)
 
-	for (let i = 0; i < contentlength; i += ContentLength) {
-		var {Body, ContentLength} = await use('getObject', fileFolder + i)
+		fileExists = true
+	} catch (error) {
+		if (error.code == 'NotFound')
+			response.statusCode = 404
+		else
+			throw error
+	}
 
-		response.write(Body)
+	if (fileExists) {
+		[
+			['Content-Type', ContentType]
+			, ['Content-Disposition', 'filename="' + fileName + '"']
+		].forEach(header =>
+			response.setHeader(...header)
+		)
+
+		for (let i = 0; i < contentlength; i += ContentLength) {
+			var {Body, ContentLength} = await use('getObject', fileFolder + i)
+
+			response.write(Body)
+		}
 	}
 
 	response.end()
