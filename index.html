@@ -34,8 +34,9 @@
 	</head>
 	<body>
 		<input id="uploadArea" type="file" multiple data-allow-reorder>
+		<button id="uploadButton" type="button">Upload</button>
 		<script>
-			FilePond.create(document.getElementById('uploadArea'), {
+			var uploader = FilePond.create(document.getElementById('uploadArea'), {
 				credits: false
 
 				, server: 'http://localhost'
@@ -44,6 +45,10 @@
 
 				, instantUpload: false
 				, allowRevert: false
+			})
+
+			document.getElementById('uploadButton').addEventListener('click', function () {
+				uploader.processFiles()
 			})
 		</script>
 	</body>
