@@ -31,25 +31,33 @@
 		</style>
 
 		<script src="https://cdn.jsdelivr.net/npm/filepond@4.x/dist/filepond.min.js"></script>
+
+		<script>
+			(function (onReady) {
+				if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading')
+					onReady()
+				else
+					document.addEventListener('DOMContentLoaded', onReady)
+			})(function () {
+				var uploader = FilePond.create(document.getElementById('uploadArea'), {
+					credits: false
+
+					, server: 'http://localhost'
+					, chunkUploads: true
+					, chunkForce: true
+
+					, instantUpload: false
+					, allowRevert: false
+				})
+
+				document.getElementById('uploadButton').addEventListener('click', function () {
+					uploader.processFiles()
+				})
+			})
+		</script>
 	</head>
 	<body>
 		<input id="uploadArea" type="file" multiple data-allow-reorder>
 		<button id="uploadButton" type="button">Upload</button>
-		<script>
-			var uploader = FilePond.create(document.getElementById('uploadArea'), {
-				credits: false
-
-				, server: 'http://localhost'
-				, chunkUploads: true
-				, chunkForce: true
-
-				, instantUpload: false
-				, allowRevert: false
-			})
-
-			document.getElementById('uploadButton').addEventListener('click', function () {
-				uploader.processFiles()
-			})
-		</script>
 	</body>
 </html>
