@@ -3,6 +3,8 @@
 	<head>
 		<title>TardiBox</title>
 
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.x/dist/filepond-plugin-image-preview.min.css">
+
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/filepond@4.x/dist/filepond.min.css">
 
 		<style>
@@ -30,6 +32,8 @@
 			}
 		</style>
 
+		<script src="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.x/dist/filepond-plugin-image-preview.min.js"></script>
+
 		<script src="https://cdn.jsdelivr.net/npm/filepond@4.x/dist/filepond.min.js"></script>
 
 		<script>
@@ -39,6 +43,8 @@
 				else
 					document.addEventListener('DOMContentLoaded', onReady)
 			})(function () {
+				FilePond.registerPlugin(FilePondPluginImagePreview)
+
 				var uploader = FilePond.create(document.getElementById('uploadArea'), {
 					credits: false
 
