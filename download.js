@@ -2,8 +2,11 @@ const {randomBytes} = require('crypto')
 
 , {storage, Bucket} = require('./storage')
 
-, use = (method, Key) =>
-	storage[method]({Bucket, Key}).promise()
+, useStorage = (method, settings = {}) =>
+	storage[method]({Bucket, ...settings}).promise()
+
+, use = (method, Key, settings = {}) =>
+	useStorage(method, {Key, ...settings})
 
 module.exports = async (request, response) => {
 	const fileName = request.url.substring(1)
@@ -33,10 +36,9 @@ module.exports = async (request, response) => {
 	if (fileExists)
 		if (
 			(
-				!maximumdownloadcount || (await storage.listObjects({
-					Bucket
-					, Prefix: downloadCountFolder
-				}).promise()).Contents.length - 1 < maximumdownloadcount
+				!maximumdownloadcount || (await useStorage('listObjects', {
+					Prefix: downloadCountFolder
+				})).Contents.length - 1 < maximumdownloadcount
 			) && (
 				!expirydateandtime || new Date() < new Date(expirydateandtime)
 			)
@@ -48,11 +50,11 @@ module.exports = async (request, response) => {
 				response.setHeader(...header)
 			)
 
-			storage.upload({
-				Bucket
-				, Key: downloadCountFolder + randomBytes(16).toString('hex')
-				, Body: ''
-			}).promise()
+			use(
+				'upload'
+				, downloadCountFolder + randomBytes(16).toString('hex')
+				, {Body: ''}
+			)
 
 			for (let i = 0; i < contentlength; i += ContentLength) {
 				var {Body, ContentLength} = await use('getObject', fileFolder  + 'part' + '/' + i)
