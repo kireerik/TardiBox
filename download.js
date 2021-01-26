@@ -1,9 +1,6 @@
 const {randomBytes} = require('crypto')
 
-, {useStorage, upload} = require('./storage')
-
-, use = (method, Key, settings = {}) =>
-	useStorage(method, {Key, ...settings})
+, {useStorage, use, upload} = require('./storage')
 
 module.exports = async (request, response) => {
 	const fileName = request.url.substring(1)

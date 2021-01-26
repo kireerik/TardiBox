@@ -11,6 +11,10 @@ const {S3} = require('aws-sdk')
 
 module.exports = {
 	useStorage
+
+	, use: (method, Key, settings = {}) =>
+		useStorage(method, {Key, ...settings})
+
 	, upload: (Key, Body = '', settings = {}) =>
 		useStorage('upload', {Key, Body, ...settings})
 }

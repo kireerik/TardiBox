@@ -4,7 +4,7 @@ const {URLSearchParams} = require('url')
 
 , {lookup} = require('mime-types')
 
-, {upload} = require('./storage')
+, {use, upload} = require('./storage')
 
 , getProperties = (...parameters) =>
 	parameters.reduce((result, [name, value]) => {
@@ -16,41 +16,59 @@ const {URLSearchParams} = require('url')
 
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
-		var uploads = []
-
 		const fileFolder = request.headers['upload-name'] + '/'
+		, firstPart = request.headers['upload-offset'] == 0
 
-		if (request.headers['upload-offset'] == 0) {
-			const {maximumDownloadCount, expiryDateAndTime} = Array.from(
-				new URLSearchParams(request.url.replace('/?', '')).entries()
-			).reduce((result, [name, value]) => ({
-				...result, [name]: value
-			}), {})
+		if (firstPart) {
+			var fileExists = true
 
-			uploads.push(
-				upload(fileFolder, undefined, {
-					...getProperties([
-						'ContentType', lookup(request.headers['upload-name'])
-					])
-					, Metadata: {
-						contentLength: request.headers['upload-length']
-
-						, ...getProperties(
-							['maximumDownloadCount', maximumDownloadCount]
-							, ['expiryDateAndTime', expiryDateAndTime]
-						)
-					}
-				})
-				, upload(fileFolder + 'downloadCount' + '/')
-			)
+			try {
+				await use('headObject', fileFolder)
+			} catch (error) {
+				if (error.code == 'NotFound')
+					fileExists = false
+				else
+					throw error
+			}
 		}
 
-		uploads.push(
-			upload(
-				fileFolder + 'part' + '/' + request.headers['upload-offset']
-				, await buffer(request)
+		if (firstPart && fileExists)
+			response.statusCode = 403
+		else {
+			var uploads = []
+
+			if (firstPart) {
+				const {maximumDownloadCount, expiryDateAndTime} = Array.from(
+					new URLSearchParams(request.url.replace('/?', '')).entries()
+				).reduce((result, [name, value]) => ({
+					...result, [name]: value
+				}), {})
+
+				uploads.push(
+					upload(fileFolder, undefined, {
+						...getProperties([
+							'ContentType', lookup(request.headers['upload-name'])
+						])
+						, Metadata: {
+							contentLength: request.headers['upload-length']
+
+							, ...getProperties(
+								['maximumDownloadCount', maximumDownloadCount]
+								, ['expiryDateAndTime', expiryDateAndTime]
+							)
+						}
+					})
+					, upload(fileFolder + 'downloadCount' + '/')
+				)
+			}
+
+			uploads.push(
+				upload(
+					fileFolder + 'part' + '/' + request.headers['upload-offset']
+					, await buffer(request)
+				)
 			)
-		)
+		}
 	}
 
 	[
