@@ -4,10 +4,10 @@ const {URLSearchParams} = require('url')
 
 , {lookup} = require('mime-types')
 
-, {storage, Bucket} = require('./storage')
+, useStorage = require('./storage')
 
 , upload = (Key, Body, settings = {}) =>
-	storage.upload({Bucket, Key, Body, ...settings}).promise()
+	useStorage('upload', {Key, Body, ...settings})
 
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {

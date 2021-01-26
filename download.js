@@ -1,9 +1,6 @@
 const {randomBytes} = require('crypto')
 
-, {storage, Bucket} = require('./storage')
-
-, useStorage = (method, settings = {}) =>
-	storage[method]({Bucket, ...settings}).promise()
+, useStorage = require('./storage')
 
 , use = (method, Key, settings = {}) =>
 	useStorage(method, {Key, ...settings})

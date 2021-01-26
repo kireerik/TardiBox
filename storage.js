@@ -4,6 +4,7 @@ const {S3} = require('aws-sdk')
 
 , {endpoint, accessKeyId, secretAccessKey, Bucket} = process.env
 
-module.exports = {
-	storage: new S3({endpoint, accessKeyId, secretAccessKey}), Bucket
-}
+, storage = new S3({endpoint, accessKeyId, secretAccessKey})
+
+module.exports = (method, settings = {}) =>
+	storage[method]({Bucket, ...settings}).promise()
