@@ -6,6 +6,14 @@ const {URLSearchParams} = require('url')
 
 , {upload} = require('./storage')
 
+, getProperties = (...parameters) =>
+	parameters.reduce((result, [name, value]) => {
+		if (value)
+			result[name] = value
+
+		return result
+	}, {})
+
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
 		var uploads = []
@@ -20,23 +28,16 @@ module.exports = async (request, response) => {
 
 			uploads.push(
 				upload(fileFolder, undefined, {
-					...(() => {
-						const ContentType = lookup(request.headers['upload-name'])
-
-						return ContentType ? {ContentType} : {}
-					})()
+					...getProperties([
+						'ContentType', lookup(request.headers['upload-name'])
+					])
 					, Metadata: {
 						contentLength: request.headers['upload-length']
 
-						, ...[
+						, ...getProperties(
 							['maximumDownloadCount', maximumDownloadCount]
 							, ['expiryDateAndTime', expiryDateAndTime]
-						].reduce((result, [name, value]) => {
-							if (value)
-								result[name] = value
-
-							return result
-						}, {})
+						)
 					}
 				})
 				, upload(fileFolder + 'downloadCount' + '/')
