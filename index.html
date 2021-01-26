@@ -2,6 +2,8 @@
 <html lang="en">
 	<head>
 		<title>TardiBox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
 
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.x/dist/filepond-plugin-image-preview.min.css">
 
@@ -12,6 +14,11 @@
 				max-width: 20em;
 				margin: 30vh auto;
 				padding: 0 .5em .5em;
+
+				font-family: Arial, Helvetica, sans-serif;
+				line-height: 2;
+
+				text-align: center;
 			}
 			.filepond--panel-root {
 				border-radius: 2em;
@@ -29,6 +36,29 @@
 			}
 			.filepond--item-panel {
 				background-color: #595e68;
+			}
+
+			#maximumDownloadCount {
+				width: 75px;
+			}
+			button {
+				margin: 16px 0 0;
+
+				border: 1px solid #2582ff;
+				border-radius: 4px;
+				padding: 10px 24px;
+
+				background-color: #fff;
+				color: #2582ff;
+				font-weight: bold;
+
+				cursor: pointer;
+
+				transition: all .15s ease-in-out;
+			}
+			button:hover {
+				background-color: #2582ff;
+				color: #fff;
 			}
 		</style>
 
@@ -80,7 +110,7 @@
 	<body>
 		<input id="uploadArea" type="file" multiple data-allow-reorder>
 		Maximum download count: <input id="maximumDownloadCount" type="number" min="1">
-		Expiry date and time: <input id="expiryDateAndTime" type="datetime-local">
-		<button id="uploadButton" type="button">Upload</button>
+		<br>Expiry time: <input id="expiryDateAndTime" type="datetime-local">
+		<br><button id="uploadButton" type="button">Upload</button>
 	</body>
 </html>
