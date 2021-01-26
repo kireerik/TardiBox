@@ -55,7 +55,7 @@ module.exports = async (request, response) => {
 			}).promise()
 
 			for (let i = 0; i < contentlength; i += ContentLength) {
-				var {Body, ContentLength} = await use('getObject', fileFolder + i)
+				var {Body, ContentLength} = await use('getObject', fileFolder  + 'part' + '/' + i)
 
 				response.write(Body)
 			}

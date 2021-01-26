@@ -48,7 +48,7 @@ module.exports = async (request, response) => {
 
 		uploads.push(
 			upload(
-				fileFolder + request.headers['upload-offset']
+				fileFolder + 'part' + '/' + request.headers['upload-offset']
 				, await buffer(request)
 			)
 		)
