@@ -1,4 +1,6 @@
-const {buffer} = require('micro')
+const {URLSearchParams} = require('url')
+
+, {buffer} = require('micro')
 
 , {lookup} = require('mime-types')
 
@@ -11,7 +13,13 @@ module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
 		var uploads = []
 
-		if (request.headers['upload-offset'] == 0)
+		if (request.headers['upload-offset'] == 0) {
+			const {maximumDownloadCount, expiryDateAndTime} = Array.from(
+				new URLSearchParams(request.url.replace('/?', '')).entries()
+			).reduce((result, [name, value]) => ({
+				...result, [name]: value
+			}), {})
+
 			uploads.push(
 				upload(
 					request.headers['upload-name'] + '/'
@@ -24,10 +32,21 @@ module.exports = async (request, response) => {
 						})()
 						, Metadata: {
 							contentLength: request.headers['upload-length']
+
+							, ...[
+								['maximumDownloadCount', maximumDownloadCount]
+								, ['expiryDateAndTime', expiryDateAndTime]
+							].reduce((result, [name, value]) => {
+								if (value)
+									result[name] = value
+
+								return result
+							}, {})
 						}
 					}
 				)
 			)
+		}
 
 		uploads.push(
 			upload(

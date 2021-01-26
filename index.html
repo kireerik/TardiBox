@@ -45,15 +45,30 @@
 			})(function () {
 				FilePond.registerPlugin(FilePondPluginImagePreview)
 
-				var uploader = FilePond.create(document.getElementById('uploadArea'), {
+				var maximumDownloadCount = document.getElementById('maximumDownloadCount')
+				, expiryDateAndTime = document.getElementById('expiryDateAndTime')
+
+				, server = 'http://localhost'
+
+				, uploader = FilePond.create(document.getElementById('uploadArea'), {
 					credits: false
 
-					, server: 'http://localhost'
+					, server
 					, chunkUploads: true
 					, chunkForce: true
 
 					, instantUpload: false
 					, allowRevert: false
+				})
+
+				;[maximumDownloadCount, expiryDateAndTime].forEach(function (element) {
+					element.addEventListener('change', function () {
+						uploader.server.url = server + '?'
+							+ 'maximumDownloadCount' + '=' + maximumDownloadCount.value
+							+ (expiryDateAndTime.value ?
+								'&' + 'expiryDateAndTime' + '=' + new Date(expiryDateAndTime.value).toISOString()
+							: '')
+					})
 				})
 
 				document.getElementById('uploadButton').addEventListener('click', function () {
@@ -64,6 +79,8 @@
 	</head>
 	<body>
 		<input id="uploadArea" type="file" multiple data-allow-reorder>
+		Maximum download count: <input id="maximumDownloadCount" type="number" min="1">
+		Expiry date and time: <input id="expiryDateAndTime" type="datetime-local">
 		<button id="uploadButton" type="button">Upload</button>
 	</body>
 </html>
