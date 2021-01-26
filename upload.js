@@ -12,6 +12,7 @@ const {URLSearchParams} = require('url')
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
 		var uploads = []
+		, fileFolder = request.headers['upload-name'] + '/'
 
 		if (request.headers['upload-offset'] == 0) {
 			const {maximumDownloadCount, expiryDateAndTime} = Array.from(
@@ -21,36 +22,33 @@ module.exports = async (request, response) => {
 			}), {})
 
 			uploads.push(
-				upload(
-					request.headers['upload-name'] + '/'
-					, ''
-					, {
-						...(() => {
-							const ContentType = lookup(request.headers['upload-name'])
+				upload(fileFolder, '', {
+					...(() => {
+						const ContentType = lookup(request.headers['upload-name'])
 
-							return ContentType ? {ContentType} : {}
-						})()
-						, Metadata: {
-							contentLength: request.headers['upload-length']
+						return ContentType ? {ContentType} : {}
+					})()
+					, Metadata: {
+						contentLength: request.headers['upload-length']
 
-							, ...[
-								['maximumDownloadCount', maximumDownloadCount]
-								, ['expiryDateAndTime', expiryDateAndTime]
-							].reduce((result, [name, value]) => {
-								if (value)
-									result[name] = value
+						, ...[
+							['maximumDownloadCount', maximumDownloadCount]
+							, ['expiryDateAndTime', expiryDateAndTime]
+						].reduce((result, [name, value]) => {
+							if (value)
+								result[name] = value
 
-								return result
-							}, {})
-						}
+							return result
+						}, {})
 					}
-				)
+				})
+				, upload(fileFolder + 'downloadCount' + '/', '')
 			)
 		}
 
 		uploads.push(
 			upload(
-				request.headers['upload-name'] + '/' + request.headers['upload-offset']
+				fileFolder + request.headers['upload-offset']
 				, await buffer(request)
 			)
 		)

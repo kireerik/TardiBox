@@ -1,17 +1,24 @@
-const {storage, Bucket} = require('./storage')
+const {randomBytes} = require('crypto')
 
-use = async (method, Key) =>
+, {storage, Bucket} = require('./storage')
+
+, use = async (method, Key) =>
 	await storage[method]({Bucket, Key}).promise()
 
 module.exports = async (request, response) => {
 	const fileName = request.url.substring(1)
 	, fileFolder = fileName + '/'
+	, downloadCountFolder = fileFolder + 'downloadCount' + '/'
 
 	var fileExists = false
 
 	try {
 		var {
-			ContentType, Metadata: {contentlength}
+			ContentType, Metadata: {
+				contentlength
+
+				, maximumdownloadcount, expirydateandtime
+			}
 		} =
 			await use('headObject', fileFolder)
 
@@ -23,20 +30,37 @@ module.exports = async (request, response) => {
 			throw error
 	}
 
-	if (fileExists) {
-		[
-			['Content-Type', ContentType]
-			, ['Content-Disposition', 'filename="' + fileName + '"']
-		].forEach(header =>
-			response.setHeader(...header)
-		)
+	if (fileExists)
+		if (
+			(
+				!maximumdownloadcount || (await storage.listObjects({
+					Bucket
+					, Prefix: downloadCountFolder
+				}).promise()).Contents.length - 1 < maximumdownloadcount
+			) && (
+				!expirydateandtime || new Date() < new Date(expirydateandtime)
+			)
+		) {
+			[
+				['Content-Type', ContentType]
+				, ['Content-Disposition', 'filename="' + fileName + '"']
+			].forEach(header =>
+				response.setHeader(...header)
+			)
 
-		for (let i = 0; i < contentlength; i += ContentLength) {
-			var {Body, ContentLength} = await use('getObject', fileFolder + i)
+			storage.upload({
+				Bucket
+				, Key: downloadCountFolder + randomBytes(16).toString('hex')
+				, Body: ''
+			}).promise()
 
-			response.write(Body)
-		}
-	}
+			for (let i = 0; i < contentlength; i += ContentLength) {
+				var {Body, ContentLength} = await use('getObject', fileFolder + i)
+
+				response.write(Body)
+			}
+		} else
+			response.statusCode = 403
 
 	response.end()
 }
