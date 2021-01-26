@@ -17,7 +17,8 @@ const {URLSearchParams} = require('url')
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
 		var uploads = []
-		, fileFolder = request.headers['upload-name'] + '/'
+
+		const fileFolder = request.headers['upload-name'] + '/'
 
 		if (request.headers['upload-offset'] == 0) {
 			const {maximumDownloadCount, expiryDateAndTime} = Array.from(
