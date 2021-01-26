@@ -4,10 +4,7 @@ const {URLSearchParams} = require('url')
 
 , {lookup} = require('mime-types')
 
-, useStorage = require('./storage')
-
-, upload = (Key, Body, settings = {}) =>
-	useStorage('upload', {Key, Body, ...settings})
+, {upload} = require('./storage')
 
 module.exports = async (request, response) => {
 	if (request.method == 'PATCH') {
@@ -22,7 +19,7 @@ module.exports = async (request, response) => {
 			}), {})
 
 			uploads.push(
-				upload(fileFolder, '', {
+				upload(fileFolder, undefined, {
 					...(() => {
 						const ContentType = lookup(request.headers['upload-name'])
 
@@ -42,7 +39,7 @@ module.exports = async (request, response) => {
 						}, {})
 					}
 				})
-				, upload(fileFolder + 'downloadCount' + '/', '')
+				, upload(fileFolder + 'downloadCount' + '/')
 			)
 		}
 

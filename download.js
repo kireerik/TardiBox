@@ -1,6 +1,6 @@
 const {randomBytes} = require('crypto')
 
-, useStorage = require('./storage')
+, {useStorage, upload} = require('./storage')
 
 , use = (method, Key, settings = {}) =>
 	useStorage(method, {Key, ...settings})
@@ -47,11 +47,7 @@ module.exports = async (request, response) => {
 				response.setHeader(...header)
 			)
 
-			use(
-				'upload'
-				, downloadCountFolder + randomBytes(16).toString('hex')
-				, {Body: ''}
-			)
+			upload(downloadCountFolder + randomBytes(16).toString('hex'))
 
 			for (let i = 0; i < contentlength; i += ContentLength) {
 				var {Body, ContentLength} = await use('getObject', fileFolder  + 'part' + '/' + i)

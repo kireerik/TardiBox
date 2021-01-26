@@ -6,5 +6,11 @@ const {S3} = require('aws-sdk')
 
 , storage = new S3({endpoint, accessKeyId, secretAccessKey})
 
-module.exports = (method, settings = {}) =>
+, useStorage = (method, settings = {}) =>
 	storage[method]({Bucket, ...settings}).promise()
+
+module.exports = {
+	useStorage
+	, upload: (Key, Body = '', settings = {}) =>
+		useStorage('upload', {Key, Body, ...settings})
+}
